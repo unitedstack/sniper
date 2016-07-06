@@ -1,0 +1,15 @@
+{
+  "modules": [{
+    "title": "s3",
+    "items": [
+      "instance"
+    ]
+  }],
+  "default_module": "instance",
+  "languages": [
+    "en",
+    "zh-CN"
+  ],
+  "routers": [],
+  "theme": "default"
+}

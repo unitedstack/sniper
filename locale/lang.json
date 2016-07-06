@@ -1,0 +1,20 @@
+{
+  "en": {
+    "application_name": "S3",
+    "basic": "Basic ",
+    "description": "Description",
+    "instance": "Instance ",
+    "logout": "Logout",
+    "properties": "Properties",
+    "status": "Status"
+  },
+  "zh-CN": {
+    "application_name": "S3",
+    "basic": "基本",
+    "description": "详细信息",
+    "instance": "云主机",
+    "logout": "注销",
+    "properties": "属性",
+    "status": "状态"
+  }
+}
