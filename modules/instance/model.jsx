@@ -40,11 +40,8 @@ class Model extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.style.display !== 'none' && this.props.style.display === 'none') {
-      if (this.state.config.table.loading) {
-        this.loadingTable();
-      } else {
-        this.getTableData(false);
-      }
+      this.loadingTable();
+      this.getTableData();
     }
   }
 
