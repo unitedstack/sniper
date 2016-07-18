@@ -1,0 +1,40 @@
+{
+  "en": {
+    "all": "All",
+    "attribute": "Attribute",
+    "bucket": "Bucket",
+    "cancel": "Cancel",
+    "copy": "Copy",
+    "create": "Create",
+    "delete": "Delete",
+    "download": "Download",
+    "folder": "Folder",
+    "more": "More",
+    "name": "Name",
+    "object-storage": "Object Storage",
+    "paste": "Paste",
+    "time": "Time",
+    "tip_bucket_name": "Bucket name is global, and name conflict may cause create operation failed. Name cannot starts with \".\" or includes \"/\"",
+    "update": "Update",
+    "upload": "Upload"
+  },
+  "zh-CN": {
+    "all": "所有",
+    "attribute": "属性",
+    "bucket": "存储桶",
+    "cancel": "取消",
+    "copy": "复制",
+    "create": "创建",
+    "delete": "删除",
+    "download": "下载",
+    "folder": "文件夹",
+    "more": "更多",
+    "name": "名称",
+    "object-storage": "对象存储",
+    "paste": "粘贴",
+    "time": "时间",
+    "tip_bucket_name": "存储桶名称为全局，重名会导致创建失败；名称中不能以\".\"开头或包含\"/\"",
+    "update": "更新",
+    "upload": "上传"
+  }
+}

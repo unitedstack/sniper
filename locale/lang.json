@@ -3,18 +3,22 @@
     "application_name": "S3",
     "basic": "Basic ",
     "description": "Description",
+    "full_stop": "。",
     "instance": "Instance ",
     "logout": "Logout",
     "properties": "Properties",
-    "status": "Status"
+    "status": "Status",
+    "there_is_no": "There is no"
   },
   "zh-CN": {
     "application_name": "S3",
     "basic": "基本",
     "description": "详细信息",
+    "full_stop": ".",
     "instance": "云主机",
     "logout": "注销",
     "properties": "属性",
-    "status": "状态"
+    "status": "状态",
+    "there_is_no": "没有"
   }
 }

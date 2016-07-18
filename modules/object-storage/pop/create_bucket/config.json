@@ -1,0 +1,20 @@
+{
+  "title": ["create", "bucket"],
+  "fields": [{
+    "type": "text",
+    "field": "text"
+  }, {
+    "type": "input",
+    "field": "name",
+    "tip_info": "tip_bucket_name"
+  }, {
+    "type": "error",
+    "field": "error",
+    "hide": true
+  }],
+  "btn": {
+    "value": "create",
+    "type": "create",
+    "disabled": false
+  }
+}

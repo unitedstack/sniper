@@ -2,10 +2,10 @@
   "modules": [{
     "title": "s3",
     "items": [
-      "instance"
+      "object-storage"
     ]
   }],
-  "default_module": "instance",
+  "default_module": "object-storage",
   "languages": [
     "en",
     "zh-CN"
