@@ -1,6 +1,6 @@
 {
   "modules": [{
-    "title": "s3",
+    "title": "storage",
     "items": [
       "object-storage"
     ]

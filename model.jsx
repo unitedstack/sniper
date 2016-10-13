@@ -30,7 +30,7 @@ class Model extends React.Component {
     if (pathList.length <= 1) {
       pathList[1] = configs.default_module;
     }
-    router.replaceState('/s3/' + pathList.slice(1).join('/'), null, null, true);
+    router.replaceState('/storage/' + pathList.slice(1).join('/'), null, null, true);
   }
 
   onChangeState(pathList) {
@@ -65,15 +65,15 @@ class Model extends React.Component {
   }
 
   componentWillUpdate() {
-    // console.time('s3');
+    // console.time('storage');
   }
 
   componentDidUpdate() {
-    // console.timeEnd('s3');
+    // console.timeEnd('storage');
   }
 
   onClickSubmenu(e, m) {
-    router.pushState('/s3/' + m.key);
+    router.pushState('/storage/' + m.key);
   }
 
   getIcon(name) {

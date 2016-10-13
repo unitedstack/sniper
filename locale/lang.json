@@ -1,6 +1,6 @@
 {
   "en": {
-    "application_name": "S3",
+    "application_name": "Storage",
     "basic": "Basic ",
     "description": "Description",
     "full_stop": "。",
@@ -11,7 +11,7 @@
     "there_is_no": "There is no"
   },
   "zh-CN": {
-    "application_name": "S3",
+    "application_name": "存储",
     "basic": "基本",
     "description": "详细信息",
     "full_stop": ".",
