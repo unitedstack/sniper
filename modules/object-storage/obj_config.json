@@ -1,0 +1,49 @@
+{
+  "btns": [{
+    "value": "upload",
+    "key": "upload",
+    "type": "create",
+    "icon": "upload"
+  }, {
+    "value": "create_folder",
+    "key": "crt_folder",
+    "type": "create",
+    "icon": "create"
+  }, {
+    "value": "download",
+    "key": "download",
+    "icon": "download",
+    "disabled": true
+  }, {
+    "value": "more",
+    "key": "more",
+    "iconClass": "more",
+    "dropdown": {
+      "items": [{
+        "items": [{
+          "title": "copy",
+          "key": "copy",
+          "disabled": true
+        }, {
+          "title": "paste",
+          "key": "paste",
+          "disabled": true
+        }, {
+          "title": "attribute",
+          "key": "attribute",
+          "disabled": true
+        }]
+      }, {
+        "items": [{
+          "title": "delete",
+          "key": "delete",
+          "danger": true,
+          "disabled": true
+        }]
+      }]
+    }
+  }, {
+    "key": "refresh",
+    "icon": "refresh"
+  }]
+}

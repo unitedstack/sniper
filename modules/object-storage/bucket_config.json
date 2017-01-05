@@ -1,0 +1,22 @@
+{
+  "btns": [{
+    "value": "create_bucket",
+    "key": "crt_bucket",
+    "type": "create",
+    "icon": "create"
+  }, {
+    "value": "attribute",
+    "key": "attribute",
+    "icon": "property",
+    "disabled": true
+  }, {
+    "value": "delete",
+    "key": "delete_bucket",
+    "type": "delete",
+    "icon": "delete",
+    "disabled": true
+  }, {
+    "key": "refresh",
+    "icon": "refresh"
+  }]
+}

@@ -1,41 +1,31 @@
 let commonModal = require('client/components/modal_common/index');
 let config = require('./config.json');
 let request = require('../../request');
+let utils = require('../../../../utils/utils');
 const __ = require('locale/client/storage.lang.json');
 
-function pop(arr, parent, callback) {
+function pop(arr, parent, breadcrumb, callback) {
   let props = {
     __: __,
     parent: parent,
     config: config,
     onConfirm: function(refs, cb) {
-      request.listBuckets().then(buckets => {
-        let bucketExist = buckets.some(b => {
-          return (b.Name === refs.name.state.value);
-        });
+      let params = {
+        Bucket: breadcrumb[0],
+        Key: utils.getURL(breadcrumb, refs.name.state.value)
+      };
 
-        if(bucketExist) {//check in case bucket name has been used
-          refs.btn.setState({
-            disabled: true
-          });
-        } else {
-          var params = {
-            Bucket: refs.name.state.value
-          };
-
-          request.createBucket(params).then((res) => {
-            cb(true);
-            callback && callback(res);
-          }).catch((err) => {
-            cb(false, 'ERROR');
-          });
-        }
+      request.putObject(params).then(res => {
+        callback && callback(res);
+        cb(true);
+      }).catch(err => {
+        cb(false, 'ERROR');
       });
     },
     onAction: function(field, state, refs) {
       switch(field) {
         case 'name':
-          let tester = /^\.|\//,
+          let tester = /\//,
             error = tester.test(refs.name.state.value);
           refs.name.setState({
             error: error || !refs.name.state.value

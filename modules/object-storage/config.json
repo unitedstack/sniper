@@ -1,53 +1,54 @@
 {
   "tabs": [{
-    "name": ["object-storage"],
+    "name": "object-storage",
     "key": "object-storage",
     "default": true
   }],
   "breadcrumb": [{
-    "name": ["all", "bucket"]
+    "name": "all_bucket",
+    "type": "all"
   }],
   "btns": [{
-    "value": ["create", "bucket"],
+    "value": "create_bucket",
     "key": "crt_bucket",
     "type": "create",
-    "icon": "create"
+    "icon": "create",
+    "disabled": true
   }, {
-    "value": ["attribute"],
+    "value": "attribute",
     "key": "attribute",
     "icon": "property",
     "disabled": true
   }, {
-    "value": ["delete"],
+    "value": "delete",
     "key": "delete_bucket",
     "type": "delete",
     "icon": "delete",
     "disabled": true
   }, {
     "key": "refresh",
-    "icon": "refresh"
+    "icon": "refresh",
+    "disabled": true
   }],
-  "search": {
-    "column": {
-      "name": true
-    }
-  },
   "table": {
     "checkbox": true,
-    "dataKey": "Name",
+    "dataKey": "id",
     "loading": true,
     "column": [{
-      "title": ["name"],
+      "title": "name",
       "key": "name",
       "sort": true
     }, {
-      "title": ["create", "time"],
+      "title": "size",
+      "key": "resource_size"
+    }, {
+      "title": "create_time",
       "key": "time"
     }],
     "data": [],
     "detail": {
       "tabs": [{
-        "name": ["description"],
+        "name": "description",
         "key": "description",
         "default": true
       }]

@@ -2,16 +2,11 @@
  * @func: convert obj value into specific language
  */
 module.exports = {
-  getLangValue(lang, obj) {
-    if (toString.call(obj) === '[object Array]') {
-      var strs = '';
-      obj.map((str) => {
-        strs += lang[str];
-      });
-
-      return strs;
+  getLangValue(lang, key) {
+    if (typeof key === 'string') {
+      return lang[key];
     } else {
-      return obj;
+      return key;
     }
   },
 
@@ -53,7 +48,7 @@ module.exports = {
         }
       });
     }
-    if (config.table.detail) {
+    if (config.table && config.table.detail) {
       config.table.detail.tabs.forEach((tab) => {
         tab.name = this.getLangValue(lang, tab.name);
       });

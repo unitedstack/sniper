@@ -1,0 +1,22 @@
+{
+  "title": ["add_project"],
+  "fields": [{
+    "type": "input",
+    "field": "project_id",
+    "tip_info": "tip_add_project",
+    "required": true
+  }, {
+    "type": "icon_label",
+    "field": "type",
+    "text": "CanonicalUser"
+  }, {
+    "type": "icon_label",
+    "field": "_permission",
+    "text": "READ"
+  }],
+  "btn": {
+    "value": "add",
+    "type": "create",
+    "disabled": true
+  }
+}

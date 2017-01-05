@@ -16,9 +16,9 @@ class Detail extends React.Component {
     this.formateBtns(this.props.btns);
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   this.formateBtns(nextProps.btns);
-  // }
+  componentWillReceiveProps(nextProps) {
+    this.formateBtns(nextProps.btns);
+  }
 
   formateBtns(btns) {
     var formatedBtns = {};

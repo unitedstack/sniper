@@ -1,20 +1,33 @@
 require('./style/index.less');
 
-var React = require('react');
-var Main = require('../../components/main/index');
-var BasicProps = require('client/components/basic_props/index');
+let React = require('react');
+let Main = require('../../components/main/index');
+let {Modal} = require('client/uskin/index');
+
+//detail
+let BucketDesc = require('./detail/bucket_desc/index');
+let ObjDesc = require('./detail/obj_desc/index');
 
 //pops
-var createBucket = require('./pop/create_bucket/index.js');
+let deleteModal = require('client/components/modal_delete/index');
+let createBucket = require('./pop/create_bucket/index');
+let createFolder = require('./pop/create_folder/index');
+let uploadObj = require('./pop/upload/index');
+let downloadObj = require('./pop/download/index');
+let pasteObj = require('./pop/paste/index');
 
-var __ = require('locale/client/s3.lang.json');
-var config = require('./config.json');
-var getStatusIcon = require('../../utils/status_icon');
-var moment = require('client/libs/moment');
-var request = require('./request');
-var router = require('client/utils/router');
-var getTime = require('client/utils/time_unification');
-var unitConverter = require('client/utils/unit_converter');
+let config = require('./config.json');
+let bucketConfig = require('./bucket_config.json');
+let objConfig = require('./obj_config.json');
+
+let __ = require('locale/client/storage.lang.json');
+let utils = require('../../utils/utils');
+let getStatusIcon = require('../../utils/status_icon');
+let converter = require('../../utils/lang_converter');
+let moment = require('client/libs/moment');
+let request = require('./request');
+let getTime = require('client/utils/time_unification');
+let unitConverter = require('client/utils/unit_converter');
 
 class Model extends React.Component {
 
@@ -24,12 +37,16 @@ class Model extends React.Component {
     moment.locale(HALO.configs.lang);
 
     this.state = {
-      config: config
+      config: config,
+      breadcrumb: [],
+      clipboard: null,
+      showDetail: false
     };
 
-    ['onInitialize', 'onAction'].forEach((m) => {
-      this[m] = this[m].bind(this);
-    });
+    ['onInitialize', 'onAction', 'onClickBucket',
+      'onClickBreadcrumb'].forEach((m) => {
+        this[m] = this[m].bind(this);
+      });
   }
 
   componentWillMount() {
@@ -51,27 +68,30 @@ class Model extends React.Component {
   }
 
   tableColRender(columns) {
+    let renderName = function(col, item, i) {
+      switch(item.type) {
+        case 'bucket':
+          return <a onClick={this.updatePage.bind(this, 'clickBucket', item)}>{item.Name}</a>;
+        case 'object':
+          return item.key;
+        case 'folder':
+          return <a onClick={this.updatePage.bind(this, 'clickFolder', item)}>{item.key}</a>;
+        default:
+          break;
+      }
+    };
+
     columns.map((column) => {
       switch (column.key) {
         case 'name':
-          column.render = (col, item, i) => {
-            if(item.Name) {
-              return <a onClick={this.onClickFolder.bind(this, item)}>{item.Name}</a>;
-            } else if(item.Key) {
-              if(/\/$/.test(item.Key)) {
-                return <a onClick={this.onClickFolder.bind(this, item)}>{item.name ? item.name.slice(0, -1) : item.Key.slice(0, -1)}</a>;
-              } else {
-                return item.name ? item.name : item.Key;
-              }
-            }
-          };
+          column.render = renderName.bind(this);
           break;
         case 'time':
           column.render = (col, item, i) => {
             if(item.CreationDate) {
-              return getTime(item.CreationDate, true);
+              return getTime(item.CreationDate.toString(), true);
             } else if (item.LastModified) {
-              return getTime(item.LastModified, true);
+              return getTime(item.LastModified.toString(), true);
             } else {
               return '-';
             }
@@ -79,8 +99,12 @@ class Model extends React.Component {
           break;
         case 'resource_size':
           column.render = (col, item, i) => {
-            var s = unitConverter(item.Size);
-            return s.num === 0 ? '-' : s.num + ' ' + s.unit;
+            if(item.Size) {
+              var s = unitConverter(item.Size);
+              return s.num === 0 ? '-' : s.num + ' ' + s.unit;
+            } else {
+              return '-';
+            }
           };
           break;
         default:
@@ -90,171 +114,219 @@ class Model extends React.Component {
   }
 
   onInitialize(params) {
-    this.getTableData(false);
+    let that = this;
+    that.getTableData(false);
   }
 
-  getTableData() {
-    request.getList().then((res) => {
-      var table = this.state.config.table;
-      table.data = res;
-      table.loading = false;
+  getTableData(detailRefresh) {
+    let state = this.state,
+      table = state.config.table;
 
-      var detail = this.refs.dashboard.refs.detail;
-      if (detail && detail.state.loading) {
-        detail.setState({
-          loading: false
+    switch(config.breadcrumb.length) {
+      case 1:
+        table.column[2].title = __.create_time;
+        request.listBuckets().then(res => {
+          table.data = res;
+          state.config.btns[0].disabled = false;
+          state.config.btns[3].disabled = false;
+          table.loading = false;
+
+          let detail = this.refs.dashboard.refs.detail;
+          if (detail && detail.state.loading) {
+            detail.setState({
+              loading: false
+            });
+          }
+
+          this.setState({
+            config: config
+          }, () => {
+            if (detail && detailRefresh) {
+              detail.refresh();
+            }
+          });
+        }).catch(err => {
+          table.loading = false;
+          this.setState({
+            config: config
+          });
         });
-      }
+        break;
+      case 2:
+        this.loadingTable();
+        request.listBucketObjects({
+          Bucket: state.breadcrumb[0]
+        }).then(res => {
+          table.data = res;
+          table.loading = false;
 
-      this.setState({
-        config: config
-      }, () => {
-        var detailVisible = detail.state.visible;
-        if (detail && detailVisible) {
-          detail.refresh();
-        }
-      });
-    });
+          this.setState({
+            config: config
+          });
+        });
+        break;
+      default:
+        this.onClickFolder();
+        break;
+    }
   }
 
-  onAction(field, actionType, refs, data) {
+  onAction(field, actionType, refs, data, isUpdateDetail) {
     switch (field) {
       case 'btnList':
-        this.onClickBtnList(data.key, refs, data);
+        this.onClickBtnList(data.key, refs, data, this.state);
         break;
       case 'table':
         this.onClickTable(actionType, refs, data);
         break;
       case 'detail':
-        this.onClickDetailTabs(actionType, refs, data);
+        this.onClickDetailTabs(actionType, refs, data, isUpdateDetail);
+        break;
+      case 'breadcrumb':
+        this.onClickBreadcrumb(data);
         break;
       default:
         break;
     }
   }
 
-  onClickFolder(item) {
-    //when click bucket, change btns
-    if(config.btns[0].key === 'crt_bucket') {
-      config.btns = [{
-        value: __.upload,
-        key: 'upload',
-        type: 'create',
-        icon: 'upload'
-      }, {
-        value: __.create + __.folder,
-        key: 'crt_folder',
-        icon: 'create'
-      }, {
-        value: __.download,
-        key: 'download',
-        icon: 'download',
-        disabled: true
-      }, {
-        value: __.more,
-        key: 'more',
-        iconClass: 'more',
-        dropdown: {
-          items: [{
-            items: [{
-              title: __.copy,
-              key: 'copy',
-              disabled: true
-            }, {
-              title: __.paste,
-              key: 'paste',
-              disabled: true
-            }, {
-              title: __.attribute,
-              key: 'attribute',
-              disabled: true
-            }]
-          }, {
-            items: [{
-              title: __.delete,
-              key: 'delete',
-              danger: true,
-              disabled: true
-            }]
-          }]
-        }
-      }];
+  onClickBreadcrumb(item) {
+    this.setState({
+      showDetail: false
+    });
 
-      config.table.column = [{
-        title: __.name,
-        key: 'name',
-        sort: true
-      }, {
-        title: __.size,
-        key: 'resource_size'
-      }, {
-        title: __.update + __.time,
-        key: 'time'
-      }];
+    //convert lang first time using bucketConfig
+    if(bucketConfig.btns[0].value === 'create_bucket') {
+      converter.convertLang(__, bucketConfig);
     }
 
-    this.tableColRender(this.state.config.table.column);
-    this.loadingTable();
-    this.refs.dashboard.clearState();
-
-    //when click bucket, request bucket objects
-    var table = this.state.config.table;
-    if(item.Name) {
-      config.breadcrumb.push({
-        name: item.Name
-      });
-
-      var params = {
-        Bucket: item.Name
-      };
-      request.getBucketResource(params).then((res) => {
-        config.table.dataKey = 'Key';
-
-        //get first layer resources under bucket
-        var tarRes = res.filter(r => {
-          var layerNum = r.Key.split('/').length;
-          if(layerNum === 1 || (layerNum === 2 && /\/$/.test(r.Key))) {
-            return true;
-          } else {
-            return false;
-          }
+    switch(item.type) {
+      case 'all':
+        //change breadcrumb and btns
+        config.breadcrumb = config.breadcrumb.slice(0, 1);
+        config.btns = bucketConfig.btns;
+        this.setState({
+          breadcrumb: []
         });
 
-        table.data = tarRes;
-        table.loading = false;
-
-        this.refs.dashboard.setState({
-          resources: res
+        //update table data
+        this.refresh({
+          tableLoading: true,
+          detailLoading: true,
+          clearState: true,
+          detailRefresh: true
         });
-      });
-    } else {
-      var layerArray = item.Key.split('/'),
-        len = layerArray.length;
-      config.breadcrumb.push({
-        name: layerArray[len - 2]
-      });
+        break;
+      case 'bucket':
+        config.breadcrumb = config.breadcrumb.slice(0, 1);
+        this.setState({
+          breadcrumb: []
+        });
 
-      //when click folders, get data from state
-      var currentLayerItems = this.getFolderResource(item.Key, this.refs.dashboard.state.resources);
-      table.data = currentLayerItems;
-      table.loading = false;
+        this.onClickBucket(item);
+        break;
+      case 'folder':
+        let len = config.breadcrumb.indexOf(item);
+        config.breadcrumb = config.breadcrumb.slice(0, len + 1);
+        let newB = this.state.breadcrumb.slice(0, len);
+        this.setState({
+          breadcrumb: newB
+        });
+        this.onClickFolder(item, newB);
+        break;
+      default:
+        break;
     }
   }
 
-  getFolderResource(currentLayer, data) {
-    var layerHead = new RegExp('^' + currentLayer);
-    var layerTail = new RegExp(currentLayer + '$');
+  updatePage(actionType, item) {
+    switch(actionType) {
+      case 'clickBucket':
+        this.onClickBucket(item);
+        break;
+      case 'clickFolder':
+        this.onClickFolder(item);
+        break;
+      default:
+        break;
+    }
+  }
 
-    //get data under folder currentLayer
-    var tarData = data.filter(item => {
-      if(layerTail.test(item.Key) || !layerHead.test(item.Key)) {
-        return false;
-      }
-      item.name = item.Key.slice(currentLayer.length);
-      return true;
+  onClickBucket(item) {
+    this.refs.dashboard.clearState();
+    this.setState({
+      showDetail: false
     });
 
-    return tarData;
+    //check necessity of changing btn list
+    if(config.btns[0].key === 'crt_bucket') {
+      if(objConfig.btns[0].value === 'upload') {
+        converter.convertLang(__, objConfig);
+      }
+      config.btns = objConfig.btns;
+      this.state.config.table.column[2].title = __.update_time;
+    }
+
+    //add new element to breadcrumb
+    config.breadcrumb.push({
+      name: item.Name ? item.Name : item.name,
+      type: item.type ? item.type : ''
+    });
+    this.setState({
+      breadcrumb: item.Name ? [item.Name] : [item.name]
+    });
+
+    //update data
+    this.loadingTable();
+    request.listBucketObjects({
+      Bucket: item.Name ? item.Name : item.name
+    }).then(res => {
+      let table = this.state.config.table;
+      table.data = res;
+      table.loading = false;
+
+      this.setState({
+        config: config
+      });
+    });
+  }
+
+  onClickFolder(item, newBreadcrumb) {
+    this.setState({
+      showDetail: false
+    });
+
+    let b = this.state.breadcrumb;
+    //add new element to breadcrumb
+    if(item && item.key) {
+      config.breadcrumb.push({
+        name: item.key,
+        type: item.type ? item.type : ''
+      });
+      b.push(item.key);
+      this.setState({
+        breadcrumb: b
+      });
+    }
+
+    //update data
+    this.loadingTable();
+    let p = {
+      Bucket: b[0],
+      Delimiter: '/',
+      Prefix: utils.getURL(b) + '/'
+    };
+    if(newBreadcrumb) {
+      p.Prefix = utils.getURL(newBreadcrumb) + '/';
+    }
+    request.listFolderObjects(p).then(res => {
+      config.table.data = res;
+      this.state.config.table.loading = false;
+
+      this.setState({
+        config: config
+      });
+    });
   }
 
   onClickTable(actionType, refs, data) {
@@ -267,10 +339,126 @@ class Model extends React.Component {
     }
   }
 
-  onClickBtnList(key, refs, data) {
+  onClickBtnList(key, refs, data, state) {
+    let rows = data.rows,
+      that = this,
+      breadcrumb = state.breadcrumb;
+
     switch (key) {
-      case 'create_bucket':
-        createBucket();
+      case 'crt_bucket':
+        createBucket(null, null, function() {
+          that.refresh({
+            detailRefresh: true
+          });
+        });
+        break;
+      case 'crt_folder':
+        createFolder(null, null, breadcrumb, () => {
+          that.refresh({
+            detailRefresh: true
+          });
+        });
+        break;
+      case 'upload':
+        uploadObj(null, null, breadcrumb, () => {
+          that.refresh({
+            detailRefresh: true
+          });
+        });
+        break;
+      case 'download':
+        downloadObj(rows[0], breadcrumb);
+        break;
+      case 'copy':
+        let source = {
+          sourceName: rows[0].key,
+          sourceURL: breadcrumb[0] + '/' + utils.getURL(breadcrumb, encodeURIComponent(rows[0].key))
+        };
+        this.setState({
+          clipboard: source
+        });
+        break;
+      case 'paste':
+        pasteObj(state.clipboard, state.breadcrumb, () => {
+          this.setState({
+            clipboard: null
+          });
+
+          this.refresh({
+            detailRefresh: true
+          });
+        });
+        break;
+      case 'delete_bucket':
+        request.listBucketObjects({
+          Bucket: rows[0].Name
+        }).then(res => {
+          if(res.length === 0) {
+            rows[0].name = rows[0].Name;
+            deleteModal({
+              __: __,
+              action: 'delete',
+              type: 'bucket',
+              data: rows,
+              onDelete: function(_data, cb) {
+                request.deleteBucket({
+                  Bucket: rows[0].Name
+                }).then(() => {
+                  cb(true);
+                  that.refresh({
+                    detailRefresh: true
+                  });
+                });
+              }
+            });
+          } else {
+            let props = {
+              title: __.tip,
+              content: __.tip_delete_warning.replace('{0}', __.bucket),
+              okText: __.confirm
+            };
+            Modal.warning(props);
+          }
+        });
+        break;
+      case 'delete':
+        let p = {
+          Bucket: breadcrumb[0],
+          Delimiter: '/',
+          Prefix: utils.getURL(breadcrumb, rows[0].key) + '/'
+        };
+        request.listFolderObjects(p).then(res => {
+          if(res.length === 0) {
+            rows[0].name = rows[0].key;
+            deleteModal({
+              __: __,
+              action: 'delete',
+              type: 'object',
+              data: rows,
+              onDelete: function(_data, cb) {
+                request.deleteObject({
+                  Bucket: that.state.breadcrumb[0],
+                  Key: rows[0].Key
+                }).then(() => {
+                  cb(true);
+                  that.refresh({
+                    detailRefresh: true
+                  });
+                });
+              }
+            });
+          } else {
+            let props = {
+              title: __.tip,
+              content: __.tip_delete_warning.replace('{0}', __.folder),
+              okText: __.confirm
+            };
+            Modal.warning(props);
+          }
+        });
+        break;
+      case 'attribute':
+        this.onClickAttribute(refs, data);
         break;
       case 'refresh':
         this.refresh({
@@ -278,7 +466,7 @@ class Model extends React.Component {
           detailLoading: true,
           clearState: true,
           detailRefresh: true
-        }, true);
+        });
         break;
       default:
         break;
@@ -297,8 +485,28 @@ class Model extends React.Component {
   }
 
   btnListRender(rows, btns) {
+    let state = this.state;
+
     for (let key in btns) {
       switch (key) {
+        case 'delete_bucket':
+          btns[key].disabled = (rows.length === 1) ? false : true;
+          break;
+        case 'download':
+          btns[key].disabled = (rows.length === 1 && rows[0].Size > 0) ? false : true;
+          break;
+        case 'copy':
+          btns[key].disabled = (rows.length === 1 && rows[0].Size > 0) ? false : true;
+          break;
+        case 'paste':
+          btns[key].disabled = state.clipboard ? false : true;
+          break;
+        case 'attribute':
+          btns[key].disabled = (rows.length === 1 && rows[0].type !== 'folder') ? false : true;
+          break;
+        case 'delete':
+          btns[key].disabled = (rows.length === 1) ? false : true;
+          break;
         default:
           break;
       }
@@ -307,86 +515,100 @@ class Model extends React.Component {
     return btns;
   }
 
-  onClickDetailTabs(tabKey, refs, data) {
-    var {rows} = data;
-    var detail = refs.detail;
-    var contents = detail.state.contents;
-    var syncUpdate = true;
+  onClickAttribute(refs, data) {
+    this.setState({
+      showDetail: !this.state.showDetail
+    });
 
-    var isAvailableView = (_rows) => {
-      if (_rows.length > 1) {
-        contents[tabKey] = (
-          <div className="no-data-desc">
-            <p>{__.view_is_unavailable}</p>
-          </div>
-        );
-        return false;
-      } else {
-        return true;
-      }
-    };
+    if(data.rows[0].type === 'bucket') {
+      this.onAction('detail', 'bucket_desc', refs, data);
+    } else {
+      this.onAction('detail', 'obj_desc', refs, data);
+    }
+  }
 
-    switch (tabKey) {
-      case 'description':
-        if (isAvailableView(rows)) {
-          var basicPropsItem = this.getBasicPropsItems(rows[0]);
+  onClickDetailTabs(tabKey, refs, data, isUpdate) {
+    let {rows} = data;
+    let detail = refs.detail,
+      state = this.state,
+      contents = detail.state.contents;
 
-          contents[tabKey] = (
-            <div>
-              <BasicProps
-                title={__.basic + __.properties}
-                defaultUnfold={true}
-                tabKey={'description'}
-                items={basicPropsItem}
-                rawItem={rows[0]}
-                onAction={this.onDetailAction.bind(this)}
-                dashboard={this.refs.dashboard ? this.refs.dashboard : null} />
-            </div>
-          );
-        }
-        break;
-      default:
-        break;
+    if(!isUpdate) {
+      detail.setState({
+        loading: true
+      });
     }
 
-    if (syncUpdate) {
+    let contentSync = function() {
       detail.setState({
         contents: contents,
         loading: false
       });
+    };
+
+    switch (tabKey) {
+      case 'update_close':
+        this.setState({
+          showDetail: false
+        });
+        break;
+      case 'bucket_desc':
+        contents.description = (
+          <BucketDesc
+            __={__}
+            rawItem={rows[0]} />
+        );
+        contentSync();
+        break;
+      case 'obj_desc':
+        let p = {
+          Bucket: state.breadcrumb[0],
+          Key: rows[0].Key
+        };
+        let url = '';
+        request.getObjectAcl(p).then(request.getObjectUrl(p).then(res => {
+          url = res;
+        })).then(acl => {
+          contents.description = (
+            <ObjDesc
+              __={__}
+              acl={acl}
+              url={url.split('?')[0]}
+              bucket={state.breadcrumb[0]}
+              rawItem={rows[0]}
+              onUpdateDetail={this.onAction.bind(this, 'detail', tabKey, refs, data)} />
+          );
+          contentSync();
+        });
+        break;
+      default:
+        break;
     }
   }
 
-  getBasicPropsItems(item) {
-    var items = [{
-      title: __.name,
-      content: item.name
-    }, {
-      title: __.id,
-      content: item.InstanceId
-    }];
+  refresh(data) {
+    let refs = this.refs;
+      // detail = refs.dashboard.refs.detail;
 
-    return items;
-  }
-
-  refresh(data, forceUpdate) {
     if (data) {
-      var path = router.getPathList();
-      if (path[2]) {
-        if (data.detailLoading) {
-          this.refs.dashboard.refs.detail.loading();
-        }
-      } else {
-        if (data.tableLoading) {
-          this.loadingTable();
-        }
-        if (data.clearState) {
-          this.refs.dashboard.clearState();
-        }
+      // if (detail.state.visible) {
+      //   if (data.detailLoading) {
+      //     detail.loading();
+      //   }
+      // } else {
+      if (data.tableLoading) {
+        this.loadingTable();
       }
+      if (data.clearState) {
+        this.setState({
+          showDetail: false
+        });
+        refs.dashboard.clearState();
+      }
+      // }
     }
 
-    this.getTableData(forceUpdate, data ? data.detailRefresh : false);
+    this.getTableData(data ? data.detailRefresh : false);
   }
 
   loadingTable() {
@@ -398,36 +620,22 @@ class Model extends React.Component {
     });
   }
 
-  onDetailAction(tabKey, actionType, data) {
-    switch (tabKey) {
-      case 'description':
-        this.onDescriptionAction(actionType, data);
-        break;
-      default:
-        break;
-    }
-  }
-
-  onDescriptionAction(actionType, data) {
-    switch (actionType) {
-      default:
-        break;
-    }
-  }
-
   render() {
+    let state = this.state,
+      props = this.props;
+
     return (
       <div className="halo-module-object-storage" style={this.props.style}>
         <Main
           ref="dashboard"
-          visible={this.props.style.display === 'none' ? false : true}
+          visible={props.style.display === 'none' ? false : true}
           onInitialize={this.onInitialize}
           onAction={this.onAction}
-          config={this.state.config}
-          params={this.props.params}
+          config={state.config}
+          params={props.params}
+          showDetail={state.showDetail}
           getStatusIcon={getStatusIcon}
-          __={__}
-        />
+          __={__} />
       </div>
     );
   }

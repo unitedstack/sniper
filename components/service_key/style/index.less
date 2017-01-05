@@ -1,0 +1,72 @@
+@import "../../../../../style/index.less";
+
+@toggle-bg-color: @color_grey;
+.halo-module-storage-key {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  .settings-close {
+    height: 48px;
+    width: 48px;
+    padding-top: 12px;
+    z-index: 100;
+    font-size: 16px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  .settings-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hide {
+    display: none;
+  }
+  .icon-remove {
+    color: @color_grey_700;
+    &:hover {
+      color: @color_delete;
+    }
+  }
+  .toggle {
+    width: 80%;
+    margin-left: 10%;
+    margin-bottom: 24px;
+    &:nth-child(1) {
+      margin: 24px 0 24px 20px;
+    }
+    .toggle-title {
+      margin-top: 30px;
+      height: 42px;
+      line-height: 42px;
+      font-size: 14px;
+      background-color: @toggle-bg-color;
+      border-radius: 2px;
+      padding: 0 16px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      user-select: none;
+      cursor: pointer;
+      i {
+        float: right;
+        height: 42px;
+        line-height: 42px;
+      }
+    }
+    .toggle-content {
+      height: 100%;
+      &.fold {
+        height: 0;
+        transition: height .5s;
+        overflow: hidden;
+      }
+      &.unfold {
+        padding-top: 20px;
+        height: auto;
+        transition: height .5s;
+      }
+    }
+  }
+}

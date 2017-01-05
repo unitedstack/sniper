@@ -78,6 +78,8 @@ class Model extends React.Component {
 
   getIcon(name) {
     switch(name) {
+      case 'object-storage':
+        return 'bucket';
       default:
         return name;
     }

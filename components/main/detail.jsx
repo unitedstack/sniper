@@ -16,12 +16,6 @@ class Detail extends React.Component {
     };
   }
 
-  componentWillMount() {}
-
-  componentDidMount() {}
-
-  componentWillReceiveProps(nextProps, nextState) {}
-
   shouldComponentUpdate(nextProps, nextState) {
     if (nextState.visible && (Object.keys(nextState.contents).length === 0)) {
       return false;
@@ -29,11 +23,15 @@ class Detail extends React.Component {
     return true;
   }
 
-  componentDidUpdate() {}
-
   updateTabContent(tab) {
     var func = this.props.onClickTabs;
     func && func(tab);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      visible: nextProps.visible
+    });
   }
 
   onClickTabs(e, tab) {
@@ -65,6 +63,15 @@ class Detail extends React.Component {
     return tabs;
   }
 
+  onClose() {
+    let props = this.props;
+    this.setState({
+      visible: false
+    });
+
+    props.updateDetailClose && props.updateDetailClose();
+  }
+
   refresh() {
     if (this.state.visible) {
       this.setState({
@@ -87,7 +94,7 @@ class Detail extends React.Component {
     return (
       <div className={'halo-com-table-detail' + (state.visible ? ' visible' : '')}>
         <div className="detail-head">
-          <div className="close">
+          <div className="close" onClick={this.onClose.bind(this)}>
             <i className="glyphicon icon-close" />
           </div>
           <Tab ref="tab" items={state.tabs} type="sm" onClick={this.onClickTabs.bind(this)} />

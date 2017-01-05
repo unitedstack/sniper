@@ -1,0 +1,65 @@
+@import "../../../../../style/theme.less";
+
+@file_background_color: @color_grey;
+@border_color: @color_grey_700;
+@add_btn_color: @color_info;
+@rm_btn_color: @color_delete;
+
+.modal-bd.halo-com-modal-upload-file {
+	min-height: 424px;
+	>div {
+		margin-bottom: 12px;
+		>span {
+			margin-left: 6px;
+		}
+	}
+	.upload-tip {
+		color: @border_color;
+	}
+	.drag-box {
+		height: 100px;
+		line-height: 100px;
+		text-align: center;
+		color: @border_color;
+		font-size: 18px;
+		border: 2px dashed @border_color;
+	}
+	.file-item {
+		height: 40px;
+		padding-left: 30px;
+		padding-right: 30px;
+		margin-bottom: 10px;
+		position: relative;
+		background-color: @file_background_color;
+		>span {
+			margin-left: 10px;
+			margin-right: 10px;
+			max-width: 520px;
+			line-height: 40px;
+			display: inline-block;
+			white-space: nowrap;
+			overflow-x: hidden;
+			text-overflow: ellipsis;
+		}
+		>i.icon-file {
+			line-height: 40px;
+			vertical-align: top;
+		}
+		>i.icon-remove {
+			line-height: 40px;
+			right: 30px;
+			position: absolute;
+			color: @rm_btn_color;
+		}
+	}
+	.add-btn {
+		height: 18px;
+		color: @add_btn_color;
+		#file-select {
+			display: none;
+		}
+	}
+	.add-btn:hover {
+		cursor: pointer;
+	}
+}
