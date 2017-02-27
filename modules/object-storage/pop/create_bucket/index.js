@@ -15,6 +15,7 @@ function pop(arr, parent, callback) {
         });
 
         if(bucketExist) {//check in case bucket name has been used
+          cb(false, __.name_conflict);
           refs.btn.setState({
             disabled: true
           });
