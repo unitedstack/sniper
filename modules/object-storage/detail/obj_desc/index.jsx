@@ -95,11 +95,13 @@ class ObjDesc extends React.Component {
   }
 
   onAddProject(item, bucket) {
+    let props = this.props;
+
     addProject({
       item: item,
       bucket: bucket,
-      acl: this.props.acl
-    });
+      acl: props.acl
+    }, null, props.onUpdateDetail);
   }
 
   render() {

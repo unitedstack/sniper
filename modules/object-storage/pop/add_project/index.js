@@ -32,6 +32,7 @@ function pop(obj, parent, callback) {
       };
 
       request.putObjectAcl(params).then(res => {
+        callback && callback(true);
         cb(true);
       }).catch(err => {
         cb(false, 'ERROR');
