@@ -26,7 +26,6 @@ let getStatusIcon = require('../../utils/status_icon');
 let converter = require('../../utils/lang_converter');
 let moment = require('client/libs/moment');
 let request = require('./request');
-let getTime = require('client/utils/time_unification');
 let unitConverter = require('client/utils/unit_converter');
 
 class Model extends React.Component {
@@ -89,9 +88,9 @@ class Model extends React.Component {
         case 'time':
           column.render = (col, item, i) => {
             if(item.CreationDate) {
-              return getTime(item.CreationDate.toString(), true);
+              return utils.getDate(item.CreationDate, true);
             } else if (item.LastModified) {
-              return getTime(item.LastModified.toString(), true);
+              return utils.getDate(item.LastModified, true);
             } else {
               return '-';
             }

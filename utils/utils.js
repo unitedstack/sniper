@@ -1,3 +1,5 @@
+let moment = require('client/libs/moment');
+
 module.exports = {
   getURL: function(breadcrumb, objKey) {
     let url = '',
@@ -10,5 +12,10 @@ module.exports = {
     }
 
     return url;
+  },
+  getDate: function(time, fromNow) {
+    if(typeof time === 'object' && fromNow) {
+      return moment(new Date(time)).fromNow();
+    }
   }
 };
