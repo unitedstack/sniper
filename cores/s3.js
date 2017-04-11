@@ -26,7 +26,7 @@ module.exports = function() {
     });
 
     S3 = new AWS.S3({
-      endpoint: window.location.protocol + '//' + window.location.hostname,
+      endpoint: window.location.protocol + '//' + window.location.hostname + ':7480',
       s3ForcePathStyle: true
     });
     return S3;
