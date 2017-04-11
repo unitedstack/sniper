@@ -26,7 +26,7 @@ module.exports = function() {
     });
 
     S3 = new AWS.S3({
-      endpoint: 'http://eos.ustack.com:7480',
+      endpoint: window.location.protocol + '//' + window.location.hostname,
       s3ForcePathStyle: true
     });
     return S3;
