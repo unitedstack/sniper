@@ -1,32 +1,32 @@
 require('./style/index.less');
 
-let React = require('react');
-let Main = require('../../components/main/index');
-let {Modal} = require('client/uskin/index');
+const React = require('react');
+const Main = require('../../components/main/index');
+const {Modal} = require('client/uskin/index');
 
 //detail
-let BucketDesc = require('./detail/bucket_desc/index');
-let ObjDesc = require('./detail/obj_desc/index');
+const BucketDesc = require('./detail/bucket_desc/index');
+const ObjDesc = require('./detail/obj_desc/index');
 
 //pops
-let deleteModal = require('client/components/modal_delete/index');
-let createBucket = require('./pop/create_bucket/index');
-let createFolder = require('./pop/create_folder/index');
-let uploadObj = require('./pop/upload/index');
-let downloadObj = require('./pop/download/index');
-let pasteObj = require('./pop/paste/index');
+const deleteModal = require('client/components/modal_delete/index');
+const createBucket = require('./pop/create_bucket/index');
+const createFolder = require('./pop/create_folder/index');
+const uploadObj = require('./pop/upload/index');
+const downloadObj = require('./pop/download/index');
+const pasteObj = require('./pop/paste/index');
 
-let config = require('./config.json');
-let bucketConfig = require('./bucket_config.json');
-let objConfig = require('./obj_config.json');
+const config = require('./config.json');
+const bucketConfig = require('./bucket_config.json');
+const objConfig = require('./obj_config.json');
 
-let __ = require('locale/client/storage.lang.json');
-let utils = require('../../utils/utils');
-let getStatusIcon = require('../../utils/status_icon');
-let converter = require('../../utils/lang_converter');
-let moment = require('client/libs/moment');
-let request = require('./request');
-let unitConverter = require('client/utils/unit_converter');
+const __ = require('locale/client/storage.lang.json');
+const utils = require('../../utils/utils');
+const getStatusIcon = require('../../utils/status_icon');
+const converter = require('../../utils/lang_converter');
+const moment = require('client/libs/moment');
+const request = require('./request');
+const unitConverter = require('client/utils/unit_converter');
 
 class Model extends React.Component {
 
@@ -99,7 +99,7 @@ class Model extends React.Component {
         case 'resource_size':
           column.render = (col, item, i) => {
             if(item.Size) {
-              var s = unitConverter(item.Size);
+              let s = unitConverter(item.Size);
               return s.num === 0 ? '-' : s.num + ' ' + s.unit;
             } else {
               return '-';
@@ -473,7 +473,7 @@ class Model extends React.Component {
   }
 
   onClickTableCheckbox(refs, data) {
-    var {rows} = data,
+    let {rows} = data,
       btnList = refs.btnList,
       btns = btnList.state.btns;
 
@@ -611,7 +611,7 @@ class Model extends React.Component {
   }
 
   loadingTable() {
-    var _config = this.state.config;
+    let _config = this.state.config;
     _config.table.loading = true;
 
     this.setState({

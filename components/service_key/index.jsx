@@ -1,12 +1,12 @@
 require('./style/index.less');
 
-var React = require('react');
-var {Tab, Button} = require('client/uskin/index');
-let MiniTable = require('client/components/detail_minitable/index');
-let converter = require('../../utils/lang_converter');
-let request = require('../../modules/object-storage/request');
+const React = require('react');
+const {Tab, Button} = require('client/uskin/index');
+const MiniTable = require('client/components/detail_minitable/index');
+const converter = require('../../utils/lang_converter');
+const request = require('../../modules/object-storage/request');
 
-var config = require('./config.json');
+const config = require('./config.json');
 
 class Model extends React.Component {
 
@@ -41,11 +41,11 @@ class Model extends React.Component {
     document.getElementById('main').style.display = 'block';
     document.getElementsByClassName('settings-detail')[0].style.display = 'none';
     document.getElementsByClassName('scroll-pane')[0].style.display = 'block';
-    var li = document.getElementsByClassName('menu')[0].getElementsByTagName('li');
-    for(var i = 0; i < li.length; i++) {
+    let li = document.getElementsByClassName('menu')[0].getElementsByTagName('li');
+    for(let i = 0; i < li.length; i++) {
       li[i].style.display = 'block';
     }
-    var haloMenu = document.getElementsByClassName('halo-com-menu')[0],
+    let haloMenu = document.getElementsByClassName('halo-com-menu')[0],
       menu = document.getElementsByClassName('menu')[0];
     ['maxWidth', 'width', 'minWidth'].forEach(m => {
       haloMenu.style[m] = '296px';

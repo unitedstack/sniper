@@ -1,13 +1,13 @@
 require('./style/index.less');
 
-var React = require('react');
-var {InputSearch, Tab, Table, Breadcrumb} = require('client/uskin/index');
-var ButtonList = require('./button_list');
-var Detail = require('./detail');
-var moment = require('client/libs/moment');
-var router = require('client/utils/router');
-var getTime = require('client/utils/time_unification');
-var converter = require('../../utils/lang_converter');
+const React = require('react');
+const {InputSearch, Tab, Table, Breadcrumb} = require('client/uskin/index');
+const ButtonList = require('./button_list');
+const Detail = require('./detail');
+const moment = require('client/libs/moment');
+const router = require('client/utils/router');
+const getTime = require('client/utils/time_unification');
+const converter = require('../../utils/lang_converter');
 
 class Main extends React.Component {
   constructor(props) {
@@ -27,8 +27,8 @@ class Main extends React.Component {
   }
 
   componentWillMount() {
-    var config = this.props.config;
-    var dataKey = config.table.dataKey;
+    let config = this.props.config;
+    let dataKey = config.table.dataKey;
 
     config.table.column.forEach((col) => {
       if (col.filter) {
@@ -36,7 +36,7 @@ class Main extends React.Component {
       }
       if (col.sort) {
         col.sortBy = function(item1, item2) {
-          var key = col.dataIndex,
+          let key = col.dataIndex,
             a = item1[key] ? item1[key] : '(' + item1[dataKey] + ')',
             b = item2[key] ? item2[key] : '(' + item2[dataKey] + ')';
 
@@ -72,7 +72,7 @@ class Main extends React.Component {
       data = {};
     }
     data.rows = this.stores.rows;
-    var func = this.props.onAction;
+    let func = this.props.onAction;
     func && func(field, actionType, this.refs, data);
   }
 
@@ -112,11 +112,11 @@ class Main extends React.Component {
 
   updateRows(data) {
     //update main store rows
-    var newRows = [];
-    var key = this.props.config.table.dataKey;
+    let newRows = [];
+    let key = this.props.config.table.dataKey;
 
     this.stores.rows.forEach((item) => {
-      var existed = data.filter((d) => d[key] === item[key])[0];
+      let existed = data.filter((d) => d[key] === item[key])[0];
 
       if (existed) {
         newRows.push(existed);
@@ -126,12 +126,12 @@ class Main extends React.Component {
     this.stores.rows = newRows;
 
     //update table checkedKey
-    var checkedKey = {};
+    let checkedKey = {};
     newRows.forEach((item) => {
       checkedKey[item[key]] = true;
     });
 
-    var table = this.refs.table;
+    let table = this.refs.table;
     if (table) {
       table.check(checkedKey);
     }
@@ -152,7 +152,7 @@ class Main extends React.Component {
   }
 
   onChangeParams(params) {
-    var table = this.refs.table,
+    let table = this.refs.table,
       detail = this.refs.detail;
 
     if(params === 2) {
@@ -179,25 +179,25 @@ class Main extends React.Component {
   }
 
   searchInTable(text) {
-    var table = this.refs.table;
+    let table = this.refs.table;
 
     if (table) {
-      var search = this.props.config.search,
+      let search = this.props.config.search,
         filterCol = search.column;
 
       if (search && search.column) {
         if (text) {
           //close detail when search start
-          var params = this.props.params;
+          let params = this.props.params;
           if (params.length > 2) {
             router.pushState('/' + params.slice(0, 2).join('/'));
           }
 
           //arguments: filter columns, filter function
           table.filter(filterCol, function(item, column) {
-            var ret = column.some((col) => {
+            let ret = column.some((col) => {
               if (filterCol[col.key] && item[col.dataIndex]) {
-                var td = item[col.dataIndex].toLowerCase();
+                let td = item[col.dataIndex].toLowerCase();
                 return td.indexOf(text.toLowerCase()) > -1 ? true : false;
               }
             });
@@ -277,7 +277,7 @@ class Main extends React.Component {
   }
 
   render() {
-    var _config = this.props.config,
+    let _config = this.props.config,
       state = this.state,
       stores = this.stores,
       tabs = _config.tabs,

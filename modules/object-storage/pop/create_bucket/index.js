@@ -1,6 +1,6 @@
-let commonModal = require('client/components/modal_common/index');
-let config = require('./config.json');
-let request = require('../../request');
+const commonModal = require('client/components/modal_common/index');
+const config = require('./config.json');
+const request = require('../../request');
 const __ = require('locale/client/storage.lang.json');
 
 function pop(arr, parent, callback) {
@@ -20,7 +20,7 @@ function pop(arr, parent, callback) {
             disabled: true
           });
         } else {
-          var params = {
+          let params = {
             Bucket: refs.name.state.value
           };
 

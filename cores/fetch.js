@@ -1,6 +1,6 @@
-var request = require('client/libs/ajax');
-var RSVP = require('rsvp');
-var Promise = RSVP.Promise;
+const request = require('client/libs/ajax');
+const RSVP = require('rsvp');
+const Promise = RSVP.Promise;
 
 function errHandler(err) {
   if (err.status === 401) {
@@ -11,7 +11,7 @@ function errHandler(err) {
   });
 }
 
-var fetch = {};
+let fetch = {};
 
 ['get', 'post', 'put', 'delete'].forEach((m) => {
   fetch[m] = function(options) {
